@@ -46,6 +46,7 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\CameraMovement.cs" />
+     <Compile Include="Assets\Scripts\GeneradorRuido\EndlessTerrain.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\GeneradorMapa.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\GeneradorTextura.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\MapDisplay.cs" />
