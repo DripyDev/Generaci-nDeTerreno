@@ -49,6 +49,7 @@
      <Compile Include="Assets\Scripts\GeneradorRuido\GeneradorMapa.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\GeneradorTextura.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\MapDisplay.cs" />
+     <Compile Include="Assets\Scripts\GeneradorRuido\MeshGenerator.cs" />
      <Compile Include="Assets\Scripts\GeneradorRuido\Ruido.cs" />
      <Compile Include="Assets\Scripts\MeshCreator\ProceduralBrackeys.cs" />
      <Compile Include="Assets\Scripts\MeshCreator\ProceduralMesh.cs" />

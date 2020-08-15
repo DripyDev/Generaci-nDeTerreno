@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class GeneradorMapa : MonoBehaviour {
     ///<summary>Tipos de dibujo posibles, uno para dibujar a color y otro para blanco y negro</summary>
-    public enum DrawMode {NoiseMap, ColourMap};
+    public enum DrawMode {NoiseMap, ColourMap, Mesh};
     public DrawMode modoDibujo;
 
+    //241 porque unity solo permite 65025 (255^2) vertices por mesh, asi que 241 es un buen numero dentro del rango
+    const int tamañoMapaChunk = 241;
     //Parametros para dibujar la textura
     //Ancho y largo de la textura
     public int ancho;
@@ -22,6 +24,11 @@ public class GeneradorMapa : MonoBehaviour {
     public float persistencia;
     public int seed;
     public Vector2 offset;
+    //Multiplicador de alturas para que la altura de cada punto varie mucho mas porque sino siempre son valores entre 0 y 1
+    public float multiplicadorAlturaMesh;
+    //Curva que vamos a usar para suavizar valores dentro de los rangos que queramos
+    public AnimationCurve curbaAlturaMesh;
+
     ///<summary>Tipos de terrenos diferentes para dibujar el mapa</summary>
     public TipoTerreno[] terrenos;
 
@@ -52,6 +59,8 @@ public class GeneradorMapa : MonoBehaviour {
             mapDisplay.DibujarTextura(GeneradorTextura.TextureFromHeigthMap(mapaRuido));
         else if(modoDibujo == DrawMode.ColourMap)
             mapDisplay.DibujarTextura(GeneradorTextura.TextureFromColourMap(mapaColores, largo, ancho));
+        else if(modoDibujo == DrawMode.Mesh)
+            mapDisplay.DibujarMesh(MeshGenerator.GenerateTerrainMesh(mapaRuido, multiplicadorAlturaMesh, curbaAlturaMesh), GeneradorTextura.TextureFromColourMap(mapaColores, largo, ancho));
     }
 
     //Se llama cada vez que se altera un valor del editor. Aprovechamos para comprobar que haya valores validos
