@@ -6,10 +6,11 @@ using System.Threading;
 
 public class GeneradorMapa : MonoBehaviour {
     ///<summary>Tipos de dibujo posibles, uno para dibujar a color y otro para blanco y negro</summary>
-    public enum DrawMode {NoiseMap, ColourMap, Mesh};
+    public enum DrawMode {NoiseMap, ColourMap, Mesh, FalloffMap};
     public DrawMode modoDibujo;
+    public Ruido.NormalizeMode normalizeMode;
     [Range(0,6)]//Toma los valores 2,4,6,8,10 y 12 asi que es el valor*2 (0 es caso especial que habra que controlar)
-    public int nivelDetalle;
+    public int nivelDetalleEditor;
 
     //241 porque unity solo permite 65025 (255^2) vertices por mesh, asi que 241 es un buen numero dentro del rango. Ahora sustituye a alctura y anchura porque siempre sera un mapa cuadrado
     public const int tamañoMapaChunk = 241;
@@ -29,6 +30,9 @@ public class GeneradorMapa : MonoBehaviour {
     public float multiplicadorAlturaMesh;
     //Curva que vamos a usar para suavizar valores dentro de los rangos que queramos
     public AnimationCurve curbaAlturaMesh;
+    //Indica si queremos usar o no el mapa Falloff o no
+    public bool useFalloff;
+    float[,] falloffMap;
 
     ///<summary>Tipos de terrenos diferentes para dibujar el mapa</summary>
     public TipoTerreno[] terrenos;
@@ -38,8 +42,12 @@ public class GeneradorMapa : MonoBehaviour {
 
     public bool autoUpdate;
 
+    void Awake(){
+        falloffMap = FalloffGenerator.GenerateFalloffMap(tamañoMapaChunk);
+    }
+
     public void DrawMapInEditor(){
-        MapData mapD = GenerarMapData(); 
+        MapData mapD = GenerarMapData(Vector2.zero); 
         //Obtenemos el script MapDisplay que esta en nuestro mismo GameObject
         MapDisplay mapDisplay = FindObjectOfType<MapDisplay>();
         if(modoDibujo == DrawMode.NoiseMap)
@@ -47,33 +55,35 @@ public class GeneradorMapa : MonoBehaviour {
         else if(modoDibujo == DrawMode.ColourMap)
             mapDisplay.DibujarTextura(GeneradorTextura.TextureFromColourMap(mapD.mapaColores, tamañoMapaChunk, tamañoMapaChunk));
         else if(modoDibujo == DrawMode.Mesh)
-            mapDisplay.DibujarMesh(MeshGenerator.GenerateTerrainMesh(mapD.mapaAltura, multiplicadorAlturaMesh, curbaAlturaMesh, nivelDetalle), GeneradorTextura.TextureFromColourMap(mapD.mapaColores, tamañoMapaChunk, tamañoMapaChunk));
+            mapDisplay.DibujarMesh(MeshGenerator.GenerateTerrainMesh(mapD.mapaAltura, multiplicadorAlturaMesh, curbaAlturaMesh, nivelDetalleEditor), GeneradorTextura.TextureFromColourMap(mapD.mapaColores, tamañoMapaChunk, tamañoMapaChunk));
+        else if(modoDibujo == DrawMode.FalloffMap)
+            mapDisplay.DibujarTextura(GeneradorTextura.TextureFromHeigthMap(FalloffGenerator.GenerateFalloffMap(tamañoMapaChunk)));
     }
 
-    public void RequesMapData(Action<MapData> callback){
+    public void RequesMapData(Vector2 centro, Action<MapData> callback){
         ThreadStart threadStart = delegate{
-            MapDataThread(callback);
+            MapDataThread(centro, callback);
         };
         new Thread(threadStart).Start();
     }
 
-    void MapDataThread(Action<MapData> callback){
-        MapData mapData = GenerarMapData();
+    void MapDataThread(Vector2 centro, Action<MapData> callback){
+        MapData mapData = GenerarMapData(centro);
         //Nos aseguramos que ningun otro thread entre en esta informacion, se bloquea para el primero que lo coja
         lock (mapDataThreadInfoQueue){
             mapDataThreadInfoQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
         }
     }
 
-    public void RequestMeshData(MapData mapdata, Action<MeshData> callback){
+    public void RequestMeshData(MapData mapdata, int lod, Action<MeshData> callback){
         ThreadStart threadStart = delegate {
-            MeshDataThread(mapdata, callback);
+            MeshDataThread(mapdata, lod, callback);
         };
         new Thread(threadStart).Start();
     }
 
-    void MeshDataThread(MapData mapdata, Action<MeshData> callback){
-        MeshData meshdata = MeshGenerator.GenerateTerrainMesh(mapdata.mapaAltura, multiplicadorAlturaMesh, curbaAlturaMesh, nivelDetalle);
+    void MeshDataThread(MapData mapdata, int lod, Action<MeshData> callback){
+        MeshData meshdata = MeshGenerator.GenerateTerrainMesh(mapdata.mapaAltura, multiplicadorAlturaMesh, curbaAlturaMesh, lod);
         lock(meshDataThreadInfoQueue) {
             meshDataThreadInfoQueue.Enqueue(new MapThreadInfo<MeshData>(callback, meshdata));
         }
@@ -94,19 +104,25 @@ public class GeneradorMapa : MonoBehaviour {
         }
     }
 
-    private MapData GenerarMapData(){
-        //Mapa de ruido
-        float[,] mapaRuido = Ruido.GeneradorRuido(tamañoMapaChunk, tamañoMapaChunk, seed, escaladoRuido, octaves, persistencia, lacunaridad, offset);
+    private MapData GenerarMapData(Vector2 centro){
+        //Mapa de ruido. El ultimo parametro es para que genere mapas diferentes en diferentes chunks
+        float[,] mapaRuido = Ruido.GeneradorRuido(tamañoMapaChunk, tamañoMapaChunk, seed, escaladoRuido, octaves, persistencia, lacunaridad, centro + offset, normalizeMode);
 
         //Mapa de colores
         Color[] mapaColores = new Color[tamañoMapaChunk * tamañoMapaChunk];
         for (int y = 0; y < tamañoMapaChunk; y++) {
             for (int x = 0; x < tamañoMapaChunk; x++) {
+                if(useFalloff){
+                    mapaRuido[x,y] = Mathf.Clamp01(mapaRuido[x,y] - falloffMap[x,y]);
+                }
+
                 float alturaActual = mapaRuido[x,y];
                 for (int i = 0; i < terrenos.Length; i++) {
                     //Devolvemos el color dentro del cual este la altura de este punto
-                    if(alturaActual <= terrenos[i].altura){
+                    if(alturaActual >= terrenos[i].altura){
                         mapaColores[y * tamañoMapaChunk + x] = terrenos[i].color;
+                    }
+                    else{
                         break;
                     }
                 }
@@ -122,6 +138,7 @@ public class GeneradorMapa : MonoBehaviour {
             octaves = 0;
         if(lacunaridad < 1)
             lacunaridad = 1;
+        falloffMap = FalloffGenerator.GenerateFalloffMap(tamañoMapaChunk);
     }
 
     //Para que se pueda crear desde el editor

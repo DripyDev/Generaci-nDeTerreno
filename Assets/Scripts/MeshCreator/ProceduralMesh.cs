@@ -29,7 +29,7 @@ public class ProceduralMesh : MonoBehaviour {
     //IEnumerator CreateShape(){
     void CreateShape(){
         vertices = new List<Vector3>();
-        float[,] mapaRuido = Ruido.GeneradorRuido(filas, columnas, 4, escalado, 30, 0.5f, 2f, new Vector2(0,0));
+        float[,] mapaRuido = Ruido.GeneradorRuido(filas, columnas, 4, escalado, 30, 0.5f, 2f, new Vector2(0,0), Ruido.NormalizeMode.Local);
         float xR = comienzoRuido; float yR = comienzoRuido;
         
         for (int z = 0; z <= filas; z++) {
