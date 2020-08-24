@@ -55,6 +55,9 @@
      <Compile Include="Assets\Scripts\GeneradorRuido\Ruido.cs" />
      <Compile Include="Assets\Scripts\MeshCreator\ProceduralBrackeys.cs" />
      <Compile Include="Assets\Scripts\MeshCreator\ProceduralMesh.cs" />
+     <Compile Include="Assets\Scripts\TerrenoEcosistema\EditorGT.cs" />
+     <Compile Include="Assets\Scripts\TerrenoEcosistema\GeneradorTerreno.cs" />
+     <Compile Include="Assets\Scripts\TerrenoEcosistema\TextureGenerator.cs" />
  <Reference Include="UnityEngine">
  <HintPath>D:/Program Files/Unity/Unity/2019.3.0f6/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>

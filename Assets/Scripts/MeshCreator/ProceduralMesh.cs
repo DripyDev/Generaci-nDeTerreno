@@ -10,11 +10,16 @@ public class ProceduralMesh : MonoBehaviour {
     public int filas;
     //El ruido de perling va a usar este valor en lugar de x e y porque funciona mejor con un cambio mas leve que con numeros enteros
     public float comienzoRuido = 0.1f;
+    public Renderer renderPlano;
+
     //Mesh que vamos a crear y alterar con ruido perling
     private Mesh mesh;
     
     private List<Vector3> vertices;
+    private List<Vector3> normales;
     private int[] triangulos;
+    private int[] quads;
+    private float[,] mapaRuido;
 
     void Start(){
         mesh = new Mesh();
@@ -29,7 +34,8 @@ public class ProceduralMesh : MonoBehaviour {
     //IEnumerator CreateShape(){
     void CreateShape(){
         vertices = new List<Vector3>();
-        float[,] mapaRuido = Ruido.GeneradorRuido(filas, columnas, 4, escalado, 30, 0.5f, 2f, new Vector2(0,0), Ruido.NormalizeMode.Local);
+        normales = new List<Vector3>();
+        mapaRuido = Ruido.GeneradorRuido(filas, columnas, 4, escalado, 30, 0.5f, 2f, new Vector2(0,0), Ruido.NormalizeMode.Local);
         float xR = comienzoRuido; float yR = comienzoRuido;
         
         for (int z = 0; z <= filas; z++) {
@@ -37,9 +43,13 @@ public class ProceduralMesh : MonoBehaviour {
             for (int x = 0; x <= columnas; x++) {
                 //float y = Mathf.PerlinNoise(xR, yR) * escalado;
                 //float y = Mathf.PerlinNoise(x * .3f, z * .3f) * escalado;
-                float y = (x==columnas || z==filas )? Mathf.PerlinNoise(xR, yR) * escalado : mapaRuido[x,z] * escalado;
+                //float y = (x==columnas || z==filas )? Mathf.PerlinNoise(xR, yR) * escalado : mapaRuido[x,z] * escalado;
                 //NOTA: En unity la altura es Y asi que vamos a usar solo x y z
+                float y = Mathf.PerlinNoise(x,z) * escalado;
+                print("x: " + x + " z: " + z);
+                print("y: " + y);
                 vertices.Add(new Vector3(x, y, z));
+                normales.Add(Vector3.up);
 
                 xR += aumentoRuido;
             }
@@ -64,16 +74,35 @@ public class ProceduralMesh : MonoBehaviour {
             vert++;
             //yield return new WaitForSeconds(0.1f);
         }
+        //Prueba quads
+        quads = new int[columnas * filas * 4];
+        int qd = 0;
+        vert = 0;
+        for (int z = 0; z < filas; z++) {
+            for (int x = 0; x < columnas; x++) {
+                quads[qd + 0] = vert + 0;
+                quads[qd + 1] = vert + 1;
+                quads[qd + 2] = vert + columnas + 2;
+                quads[qd + 3] = vert + columnas + 1;
+
+                vert++;
+                qd += 4;
+            }
+            vert++;
+        }
     }
 
     void PrepararMesh(){
         mesh.Clear();
         mesh.vertices = vertices.ToArray();
         mesh.triangles = triangulos;
+        //mesh.SetIndices(quads, MeshTopology.Quads, 0);
+        //mesh.SetNormals(normales);
         mesh.RecalculateNormals();
     }
 
     void Update() {
+        renderPlano.sharedMaterial.mainTexture = GeneradorTextura.TextureFromHeigthMap(mapaRuido);
         if(Input.GetKeyDown("p")){
             CreateShape();
             PrepararMesh();

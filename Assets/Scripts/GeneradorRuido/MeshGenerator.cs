@@ -29,6 +29,7 @@ public static class MeshGenerator {
         for (int y = 0; y < largo; y+=incrementoSimplificacionMesh) {
             for (int x = 0; x < ancho; x+=incrementoSimplificacionMesh) {
 
+                //meshData.vertices[indiceVertices] = new Vector3(topLeftX + x, curvaAltura.Evaluate(mapaAlturas[x,y]) * multiplicadorAltura, topLeftZ - y);
                 meshData.vertices[indiceVertices] = new Vector3(topLeftX + x, curvaAltura.Evaluate(mapaAlturas[x,y]) * multiplicadorAltura, topLeftZ - y);
                 meshData.uvs[indiceVertices] = new Vector2(x/(float) ancho, y/(float)largo);
 

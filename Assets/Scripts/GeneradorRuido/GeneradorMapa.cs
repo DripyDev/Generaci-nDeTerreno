@@ -105,7 +105,7 @@ public class GeneradorMapa : MonoBehaviour {
     }
 
     private MapData GenerarMapData(Vector2 centro){
-        //Mapa de ruido. El ultimo parametro es para que genere mapas diferentes en diferentes chunks
+        //Mapa de ruido. El penultimo parametro es para que genere mapas diferentes en diferentes chunks
         float[,] mapaRuido = Ruido.GeneradorRuido(tamañoMapaChunk, tamañoMapaChunk, seed, escaladoRuido, octaves, persistencia, lacunaridad, centro + offset, normalizeMode);
 
         //Mapa de colores
