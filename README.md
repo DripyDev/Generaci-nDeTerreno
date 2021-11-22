@@ -22,7 +22,7 @@ Con el mesh generado, vamos a crear un mapa de alturas a través del **ruido Per
 
 Ruido Perlin |  Mapa de colores
 :-------------------------:|:-------------------------:
-![](https://user-images.githubusercontent.com/61519721/142904805-f7290eb6-7206-44f0-b7df-cf2a4dde6d0c.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142904802-de8679c3-3009-42b6-9dbb-8d8a53b8a0f7.PNG)
+![](https://user-images.githubusercontent.com/61519721/142911369-dadcb3b2-8753-4cdb-91dd-2d78c5e27688.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142911371-482d28c2-01fd-430d-8ef3-0799b03b749f.PNG)
 
 Cabe destacar que a la hora de generar el ruido podemos hacerlo simplemente con la función *PerlinNoise* del paquete *Mathf* de Unity o podemos mejorarlo de manera significativa aplicando una serie de técnicas. A continuación podemos ver la diferencia en el ruido sin y con mejoras tanto en mapa de alturas como en mapa de colores.
 
@@ -33,6 +33,13 @@ Ruido Perlin no mejorado |  Ruido Perlin mejorado
 Mapa de colores no mejorado |  Mapa de colores mejorado
 :-------------------------:|:-------------------------:
 ![](https://user-images.githubusercontent.com/61519721/142911066-770cf526-e0a3-4f05-b46d-7dcd90588471.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142911063-f5984174-7e4a-4802-9acd-d899759aa00a.PNG)
+
+Las mejoras son a través del uso de **octavas**, una **semilla**, **persistencia** y **lagunaridad**. A continuación resumiré de manera breve para que sirve cada una de las mejoras.
+
++ **Octavas:** Para obtener mas detalle acumulamos capas (octavas) unas sobre otras, pero cada una partirá de un origen diferente. A mas capas, mayor detalle, aunque esto depende en gran medida del valor de la persistencia, que afecta al rango de valores que se pueden tomar.
++ **Persistencia:** Afecta al rango de valores que puede tomar el mapa de alturas.
++ **Lagunaridad:**
++ **Semilla:**
 
 
 ## Generación del terreno final
