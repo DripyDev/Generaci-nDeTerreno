@@ -26,12 +26,13 @@ Ruido Perlin |  Mapa de colores
 
 Cabe destacar que a la hora de generar el ruido podemos hacerlo simplemente con la función *PerlinNoise* del paquete *Mathf* de Unity o podemos mejorarlo de manera significativa aplicando una serie de técnicas. A continuación podemos ver la diferencia en el ruido sin y con mejoras tanto en mapa de alturas como en mapa de colores.
 
-Ruido Perlin no mejorad |  Ruido Perlin mejorado
+Ruido Perlin no mejorado |  Ruido Perlin mejorado
 :-------------------------:|:-------------------------:
-![](https://user-images.githubusercontent.com/61519721/142904805-f7290eb6-7206-44f0-b7df-cf2a4dde6d0c.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142904802-de8679c3-3009-42b6-9dbb-8d8a53b8a0f7.PNG)
+![](https://user-images.githubusercontent.com/61519721/142911059-f263652f-c893-4796-9911-0c2639ba7b5d.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142911069-33af3d0c-84c1-4e5f-9f21-ca517def4d87.PNG)
 
 Mapa de colores no mejorado |  Mapa de colores mejorado
 :-------------------------:|:-------------------------:
-![](https://user-images.githubusercontent.com/61519721/142904805-f7290eb6-7206-44f0-b7df-cf2a4dde6d0c.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142904802-de8679c3-3009-42b6-9dbb-8d8a53b8a0f7.PNG)
+![](https://user-images.githubusercontent.com/61519721/142911066-770cf526-e0a3-4f05-b46d-7dcd90588471.PNG)  |  ![](https://user-images.githubusercontent.com/61519721/142911063-f5984174-7e4a-4802-9acd-d899759aa00a.PNG)
+
 
 ## Generación del terreno final
